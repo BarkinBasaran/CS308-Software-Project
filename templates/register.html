@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Genel stil */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+    }
+
+    /* Form kabı */
+    .center-container {
+      width: 400px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    /* Logo - Tıklanabilir */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo-link {
+      text-decoration: none;
+    }
+    .logo-text {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #e94057;
+      transition: transform 0.3s ease-in-out;
+    }
+    .logo-text:hover {
+      transform: scale(1.1);
+    }
+
+    /* Form başlığı */
+    .signup-form h2 {
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    /* Giriş alanları */
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .input-group label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #333;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+    }
+
+    /* Flash mesajları */
+    .error {
+      color: #ff4444;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .success {
+      color: green;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* Kayıt butonu */
+    .btn-signup {
+      width: 100%;
+      padding: 12px;
+      background: #e94057;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .btn-signup:hover {
+      transform: scale(1.05);
+    }
+
+    /* Linkler */
+    .login-btn {
+      display: block;
+      margin: 10px 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: #0074D9;
+      font-weight: 500;
+    }
+    .login-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Kayıt Formu -->
+  <div class="center-container">
+    <div class="logo-area">
+      <a href="home" class="logo-link">
+        <div class="logo-text">ChipMaster</div>
+      </a>
+    </div>
+
+    <form method="POST" action="/register" class="signup-form">
+      <h2>Sign Up</h2>
+
+      <!-- ✅ Flash Mesajlarını Burada Göster -->
+      {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Email Girişi -->
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+      </div>
+
+      <!-- Kullanıcı Adı -->
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Your username" required>
+      </div>
+
+      <!-- Şifre Girişi -->
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Your password" required minlength="6">
+      </div>
+
+      <!-- Şifre Onayı -->
+      <div class="input-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required minlength="6">
+      </div>
+
+      <button type="submit" class="btn-signup">Sign Up</button>
+      <a href="login" class="login-btn">Already have an account? Log In</a>
+    </form>
+  </div>
+
+</body>
+</html>

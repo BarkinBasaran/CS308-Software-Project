@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.discount-form-sticky {
+  background: #232323;
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px #0003;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-end;
+}
+.discount-form-sticky label { color: #ff5e62; font-weight: 600; }
+.discount-form-sticky input, .discount-form-sticky select {
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+}
+.discount-form-sticky button {
+  background: #ff5e62;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.discount-form-sticky button:hover { background: #ff2e3a; }
+.discount-table-container { margin-top: 1rem; }
+.discount-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #222;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #0003;
+}
+.discount-table th, .discount-table td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+}
+.discount-table th {
+  background: #232323;
+  color: #ff5e62;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-bottom: 2px solid #333;
+}
+.discount-table tr {
+  transition: background 0.15s;
+}
+.discount-table tr:hover {
+  background: #292929;
+}
+.discount-table td {
+  color: #eee;
+  border-bottom: 1px solid #292929;
+}
+</style>
+
+<div class="container mt-4">
+  <h1>Apply Discount</h1>
+  <form id="discount-form" class="discount-form-sticky">
+    <div>
+      <label for="discount-rate">Discount Rate (%)</label>
+      <input type="number" id="discount-rate" min="1" max="99" class="form-control" placeholder="e.g., 10" required>
+    </div>
+    <div>
+      <label for="start-date">Start Date</label>
+      <input type="date" id="start-date" class="form-control" required>
+    </div>
+    <div>
+      <label for="end-date">End Date</label>
+      <input type="date" id="end-date" class="form-control" required>
+    </div>
+    <div style="flex:1 1 100px;"></div>
+    <button type="button" id="apply-discount">Apply Discount</button>
+  </form>
+  <div class="discount-table-container">
+    <table class="discount-table">
+      <thead>
+        <tr>
+          <th style="width:40px;"></th>
+          <th>Name</th>
+          <th style="width:120px;">Current Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td><input type="checkbox" class="prod-check" value="{{ p.id }}"></td>
+          <td>{{ p.name }}</td>
+          <td>${{ '%.2f'|format(p.price) }}
+            {% if p.discounted_price is not none and p.discounted_price < p.price %}
+              <br>
+              <span style="color:#ff5e62;font-size:0.95rem;">İndirimli: ${{ '%.2f'|format(p.discounted_price) }}</span>
+              <button class="remove-discount-btn" data-id="{{ p.id }}" style="background:#e94057;color:#fff;margin-left:8px;">Remove Discount</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" tabindex="-1" id="discountModal" style="display:none; background:rgba(0,0,0,0.6); position:fixed; top:0; left:0; width:100vw; height:100vh; align-items:center; justify-content:center; z-index:9999;">
+  <div style="background:#222; border-radius:10px; padding:2rem; min-width:320px; max-width:90vw; box-shadow:0 2px 16px #0008; color:#fff;">
+    <h4>Confirm Discount</h4>
+    <p id="modalSummary"></p>
+    <div style="display:flex; gap:1rem; justify-content:flex-end; margin-top:1.5rem;">
+      <button type="button" class="btn btn-secondary" id="modalCancel">Cancel</button>
+      <button type="button" class="btn btn-success" id="modalConfirm">Apply</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const modal = document.getElementById('discountModal');
+const modalSummary = document.getElementById('modalSummary');
+const modalCancel = document.getElementById('modalCancel');
+const modalConfirm = document.getElementById('modalConfirm');
+let discountPayload = null;
+
+document.getElementById('apply-discount').onclick = () => {
+  const selected = Array.from(document.querySelectorAll('.prod-check:checked')).map(chk => parseInt(chk.value));
+  const discountRate = parseFloat(document.getElementById('discount-rate').value);
+  const startDate = document.getElementById('start-date').value;
+  const endDate = document.getElementById('end-date').value;
+  if (!selected.length) return alert('Select at least one product');
+  if (!discountRate || !startDate || !endDate) return alert('Fill all fields');
+  discountPayload = { product_ids: selected, discount_rate: discountRate, start_date: startDate, end_date: endDate };
+  modalSummary.innerHTML = `Apply <b>${discountRate}%</b> discount to <b>${selected.length}</b> product(s) from <b>${startDate}</b> to <b>${endDate}</b>?`;
+  modal.style.display = 'flex';
+};
+modalCancel.onclick = () => { modal.style.display = 'none'; };
+modalConfirm.onclick = () => {
+  fetch('/api/discounts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(discountPayload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) alert(data.error || 'Error applying discount');
+    else location.reload();
+  });
+};
+modal.onclick = function(e) { if (e.target === modal) modal.style.display = 'none'; };
+
+// Remove Discount
+Array.from(document.getElementsByClassName('remove-discount-btn')).forEach(btn => {
+  btn.addEventListener('click', () => {
+    const productId = btn.dataset.id;
+    if (confirm('İndirimi kaldırmak istediğinize emin misiniz?')) {
+      fetch(`/api/discounts/remove/${productId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) alert(data.error || 'İndirim kaldırılamadı');
+        else location.reload();
+      });
+    }
+  });
+});
+</script>
+{% endblock %} 

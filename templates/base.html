@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ChipMaster{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #1a1a1a;
+      color: #eee;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    header {
+      background: #000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 10;
+      padding: 10px 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      overflow: visible;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: visible;
+    }
+    .logo-area {
+      text-align: center;
+    }
+    .logo-link {
+      text-decoration: none;
+    }
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff5e62;
+      transition: transform 0.3s ease-in-out;
+      display: inline-block;
+    }
+    .logo-text:hover {
+      transform: scale(1.1);
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li {
+      margin-left: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a {
+      color: #eee;
+      font-weight: 500;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a ion-icon {
+      font-size: 1.2rem;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+    }
+    .nav-links li a:hover {
+      color: #ff5e62;
+    }
+    main.container {
+      margin-top: 80px;
+    }
+    .profile-dropdown {
+      position: relative;
+    }
+    .profile-dropdown .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #222;
+      color: #fff;
+      min-width: 160px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      z-index: 100;
+      padding: 0.5rem 0;
+    }
+    .profile-dropdown:hover .dropdown-menu {
+      display: block;
+    }
+    .profile-dropdown .dropdown-menu li {
+      list-style: none;
+    }
+    .profile-dropdown .dropdown-menu a {
+      display: block;
+      color: #fff;
+      padding: 10px 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .profile-dropdown .dropdown-menu a:hover {
+      background: #ff5e62;
+      color: #fff;
+    }
+    .product-image[src*="no-image"] {
+      object-fit: contain;
+      background: #222;
+      border: 2px dashed #444;
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      height: 180px;
+      display: block;
+      margin: 0 auto;
+    }
+    </style>
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <!-- Header/Navbar -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('main.home') }}" class="logo-link">
+          <h1 class="logo-text">ChipMaster</h1>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('main.home') }}"><ion-icon name="home-outline"></ion-icon>Home</a></li>
+          <li><a href="{{ url_for('main.products') }}"><ion-icon name="pricetag-outline"></ion-icon>Products</a></li>
+          <li><a href="{{ url_for('main.cart') }}"><ion-icon name="cart-outline"></ion-icon>My Cart</a></li>
+          <li><a href="{{ url_for('main.wishlist') }}" title="Wishlist"><ion-icon name="heart-outline" style="font-size:1.3rem;"></ion-icon> Wishlist</a></li>
+          {% if session.get('user_id') %}
+            <li class="profile-dropdown">
+              <a href="{{ url_for('main.profile') }}"><i class="fa fa-user"></i> {{ session.get('username', 'User') }}</a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ url_for('main.orders') }}">Orders</a></li>
+                {% if session.get('role') == 'product_manager' %}
+                  <li><a href="{{ url_for('product_manager.dashboard') }}">Product Manager Dashboard</a></li>
+                {% endif %}
+                {% if session.get('role') == 'sales_manager' %}
+                  <li><a href="{{ url_for('sales_manager.dashboard') }}">Sales Manager Dashboard</a></li>
+                {% endif %}
+                {# <li><a href="{{ url_for('main.ratings') }}">Ratings</a></li> #}
+                <li><a href="{{ url_for('main.profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('main.logout') }}">Log Out</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li><a href="{{ url_for('main.login') }}"><i class="fa fa-user"></i> Log In</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html> 

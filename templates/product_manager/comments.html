@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.comment-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 1rem; margin-top: 1rem; }
+.comment-card { background: #222; border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; }
+.comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-size: 0.9rem; color: #aaa; }
+.comment-header .product { font-weight: 600; color: #fff; }
+.comment-body { color: #ccc; margin-bottom: 1rem; flex-grow: 1; }
+.comment-actions { display: flex; gap: 0.5rem; }
+.comment-actions button { border: none; padding: 0.6rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem; flex: 1; }
+.btn-approve { background: #2ecc71; color: #000; }
+.btn-reject { background: #e74c3c; color: #fff; }
+.btn-delete { background: #555; color: #fff; }
+</style>
+
+<div class="container mt-4">
+  <h1 class="mb-4">Pending Comments</h1>
+  <div class="comment-grid">
+    {% for comment in comments %}
+    <div class="comment-card">
+      <div class="comment-header">
+        <span class="product">{{ comment.product.name }}</span>
+        <span class="user">{{ comment.user.username }}</span>
+        <span class="date">{{ comment.comment_date.strftime('%Y-%m-%d') }}</span>
+      </div>
+      <div class="comment-body">
+        {{ comment.comment }}
+      </div>
+      <div class="comment-actions">
+        <button class="btn-approve approve-comment" data-id="{{ comment.id }}"><ion-icon name="checkmark-outline"></ion-icon>Approve</button>
+        <button class="btn-reject reject-comment" data-id="{{ comment.id }}"><ion-icon name="close-outline"></ion-icon>Reject</button>
+        <button class="btn-delete delete-comment" data-id="{{ comment.id }}"><ion-icon name="trash-outline"></ion-icon>Delete</button>
+      </div>
+    </div>
+    {% endfor %}
+    {% if not comments %}
+    <p>No pending comments.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.approve-comment').forEach(btn => {
+    btn.addEventListener('click', () => {
+      fetch(`/api/comments/${btn.dataset.id}/approve`, { method: 'POST' })
+        .then(res => res.json()).then(data => {
+          if (data.success) location.reload();
+          else alert(data.error || 'Error approving comment');
+        }).catch(() => alert('Network error'));
+    });
+  });
+  document.querySelectorAll('.reject-comment').forEach(btn => {
+    btn.addEventListener('click', () => {
+      fetch(`/api/comments/${btn.dataset.id}/reject`, { method: 'POST' })
+        .then(res => res.json()).then(data => {
+          if (data.success) location.reload();
+          else alert(data.error || 'Error rejecting comment');
+        }).catch(() => alert('Network error'));
+    });
+  });
+  document.querySelectorAll('.delete-comment').forEach(btn => {
+    btn.addEventListener('click', () => {
+      fetch(`/api/comments/${btn.dataset.id}/delete`, { method: 'POST' })
+        .then(res => res.json()).then(data => {
+          if (data.success) location.reload();
+          else alert(data.error || 'Error deleting comment');
+        }).catch(() => alert('Network error'));
+    });
+  });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  header {
+    background: #000 !important;
+  }
+  .returns-title {
+    color: #ff5e62;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    margin-bottom: 2rem;
+    text-align: left;
+    border-left: 5px solid #ff5e62;
+    padding-left: 18px;
+  }
+  .returns-container {
+    background: #181a1b;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  .returns-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #eee;
+  }
+  .returns-table th {
+    background: #232323;
+    color: #ff5e62;
+    font-weight: 600;
+    padding: 12px 15px;
+    text-align: left;
+    border-top: 1px solid #333;
+    border-bottom: 2px solid #ff5e62;
+  }
+  .returns-table th:first-child {
+    border-top-left-radius: 10px;
+  }
+  .returns-table th:last-child {
+    border-top-right-radius: 10px;
+    text-align: center;
+  }
+  .returns-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #333;
+    vertical-align: middle;
+  }
+  .returns-table tr:last-child td {
+    border-bottom: none;
+  }
+  .returns-table tr:hover {
+    background: rgba(34, 36, 37, 0.4);
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+  }
+  .status-pending {
+    background: #332b0d;
+    color: #ffb347;
+    border: 1px solid #5c4e1a;
+  }
+  .status-approved {
+    background: #223c2c;
+    color: #4be37a;
+    border: 1px solid #2e7d4f;
+  }
+  .status-rejected {
+    background: #3c2226;
+    color: #e34b69;
+    border: 1px solid #7d2e3e;
+  }
+  .approve-btn, .reject-btn {
+    min-width: 80px;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+    margin: 0 4px;
+  }
+  .approve-btn {
+    background: #2e7d4f;
+    color: white;
+  }
+  .approve-btn:hover {
+    background: #4be37a;
+    color: #222;
+    box-shadow: 0 0 10px rgba(75, 227, 122, 0.3);
+  }
+  .reject-btn {
+    background: #7d2e3e;
+    color: white;
+  }
+  .reject-btn:hover {
+    background: #e34b69;
+    color: #222;
+    box-shadow: 0 0 10px rgba(227, 75, 105, 0.3);
+  }
+  .action-col {
+    text-align: center;
+    white-space: nowrap;
+  }
+  .button-container {
+    display: inline-flex;
+    gap: 8px;
+  }
+  .empty-returns {
+    text-align: center;
+    padding: 2rem;
+    color: #aaa;
+    font-size: 1.1rem;
+  }
+</style>
+
+<div class="container my-5">
+  <h2 class="returns-title">Manage Returns</h2>
+  
+  <div class="returns-container">
+    {% if returns %}
+    <div class="table-responsive">
+      <table class="returns-table">
+        <thead>
+          <tr>
+            <th>Return ID</th>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ret in returns %}
+          <tr>
+            <td>#{{ ret.id }}</td>
+            <td>#{{ ret.order_id }}</td>
+            <td>{{ ret.user.username }}</td>
+            <td>{{ ret.product.name }}</td>
+            <td>{{ ret.quantity }}</td>
+            <td>{{ ret.reason }}</td>
+            <td>
+              <span class="status-badge status-{{ ret.status }}">
+                {{ ret.status.capitalize() }}
+              </span>
+            </td>
+            <td class="action-col">
+              {% if ret.status == 'pending' and ret.order.status == 'delivered' %}
+              <div class="button-container">
+                <button class="approve-btn process-return" data-return-id="{{ ret.id }}" data-order-id="{{ ret.order_id }}">Approve</button>
+                <button class="reject-btn reject-return" data-return-id="{{ ret.id }}">Reject</button>
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-returns">
+      <p>No return requests found.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Approve return and refund
+document.querySelectorAll('.process-return').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (confirm('Approve this return and process refund?')) {
+      const returnId = btn.dataset.returnId;
+      const orderId = btn.dataset.orderId;
+      
+      fetch(`/api/refunds/${orderId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          approved: true,
+          return_id: returnId
+        }),
+        credentials: 'same-origin'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          alert(data.error || 'Error processing refund');
+        } else {
+          // Success notification
+          alert('Return approved successfully!');
+          location.reload();
+        }
+      })
+      .catch(err => {
+        alert('Network error occurred. Please try again.');
+      });
+    }
+  });
+});
+
+// Reject return
+document.querySelectorAll('.reject-return').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to reject this return?')) {
+      const returnId = btn.dataset.returnId;
+      
+      fetch(`/api/returns/${returnId}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          alert(data.error || 'Error rejecting return');
+        } else {
+          // Success notification
+          alert('Return rejected successfully!');
+          location.reload();
+        }
+      })
+      .catch(err => {
+        alert('Network error occurred. Please try again.');
+      });
+    }
+  });
+});
+</script>
+{% endblock %} 

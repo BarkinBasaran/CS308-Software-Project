@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChipMaster - Home</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth; /* Yumuşak kaydırma efekti */
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #1a1a1a;
+      color: #eee;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Header */
+    header {
+      background: #000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 10;
+      padding: 10px 0; /* Logo kesilme sorunu için padding eklendi */
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      overflow: hidden;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-area {
+      text-align: center;
+    }
+    .logo-link {
+      text-decoration: none;
+    }
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff5e62;
+      transition: transform 0.3s ease-in-out;
+      display: inline-block; /* Kırpılma olmaması için */
+    }
+    .logo-text:hover {
+      transform: scale(1.1);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li {
+      margin-left: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a {
+      color: #eee;
+      font-weight: 500;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a ion-icon {
+      font-size: 1.2rem;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+    }
+    .nav-links li a:hover {
+      color: #ff5e62;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 90px; /* Header yüksekliği için boşluk */
+      background: linear-gradient(120deg, #2C3E50, #8E44AD, #E67E22, #2C3E50);
+      background-size: 600% 600%;
+      animation: sunset 6s linear infinite;
+    }
+    @keyframes sunset {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
+    .hero > div {
+      position: relative;
+      z-index: 2;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #ddd;
+    }
+    .hero a {
+      background: #ff5e62;
+      padding: 0.8rem 1.5rem;
+      color: #fff;
+      font-size: 1rem;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .hero a:hover {
+      background: #e94057;
+    }
+
+    /* Products Section */
+    .products {
+      padding: 4rem 0;
+      background: #fff;
+      color: #333;
+    }
+    .products h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .product {
+      background: #f7f7f7;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .product:hover {
+      transform: translateY(-5px);
+    }
+    .product img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    .product h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    .product p {
+      font-size: 1rem;
+      color: #777;
+      margin-bottom: 0.5rem;
+    }
+    .product .rating {
+      margin: 0.5rem 0;
+      color: #666;
+    }
+    .product .btn {
+      background: #ff5e62;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      margin-top: auto;
+      transition: background 0.3s;
+    }
+    .product .btn:hover {
+      background: #e94057;
+    }
+
+    /* Footer */
+    footer {
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .wishlist-btn {
+      background: none;
+      border: none;
+      color: #bbb;
+      font-size: 1.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 2;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+    .wishlist-btn:hover {
+      color: #ff5e62;
+      background: none;
+      box-shadow: none;
+    }
+    .wishlist-btn.active {
+      color: #ff5e62;
+      background: none;
+      box-shadow: none;
+    }
+    .wishlist-btn i {
+      font-size: 1.5em;
+      pointer-events: none;
+    }
+    @media (max-width: 600px) {
+      .wishlist-btn {
+        font-size: 1.3rem;
+        top: 10px !important;
+        left: 10px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('main.home') }}" class="logo-link">
+          <h1 class="logo-text">ChipMaster</h1>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('main.home') }}"><ion-icon name="home-outline"></ion-icon>Home</a></li>
+          <li><a href="{{ url_for('main.products') }}"><ion-icon name="pricetag-outline"></ion-icon>Products</a></li>
+          <li><a href="{{ url_for('main.cart') }}"><ion-icon name="cart-outline"></ion-icon>My Cart</a></li>
+          <li><a href="{{ url_for('main.wishlist') }}" title="Wishlist"><ion-icon name="heart-outline" style="font-size:1.3rem;"></ion-icon> Wishlist</a></li>
+          {% if session.get('logged_in') %}
+            <li><a href="{{ url_for('main.profile') }}"><ion-icon name="person-outline"></ion-icon>{{ session.get('username', 'User') }}</a></li>
+            <li><a href="{{ url_for('main.logout') }}"><ion-icon name="log-out-outline"></ion-icon>Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('main.login') }}"><ion-icon name="person-outline"></ion-icon>Log In</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div>
+      <h1>Small Chips, Big Impact</h1>
+      <p>Discover our exclusive products</p>
+      <a href="{{ url_for('main.products') }}" class="scroll-link">Explore Now</a>
+    </div>
+  </section>
+
+  <!-- Products Section -->
+  <section class="products">
+    <div class="container">
+      <h2>Featured Products</h2>
+      <div class="product-grid">
+        {% for product in featured_products %}
+        <div class="product" style="position:relative;">
+          <button class="wishlist-btn{% if product.in_wishlist %} active{% endif %}" data-product-id="{{ product.id }}" title="Add to Wishlist" style="position:absolute;top:16px;left:16px;z-index:2;">
+            <i class="{% if product.in_wishlist %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+          </button>
+          <img src="{{ product.image }}" alt="{{ product.name }}">
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.description }}</p>
+          <p>Starting from ${{ "%.2f"|format(product.price) }}</p>
+          <div class="rating">
+            <span>Rating: {{ "%.1f"|format(product.rating) }}/5</span>
+            <span>({{ product.total_reviews }} reviews)</span>
+          </div>
+          <a href="{{ url_for('main.product_details', product_id=product.id) }}" class="btn">View Details</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 ChipMaster. All rights reserved.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script>
+    // Wishlist bildirimi
+    const wishlistNotification = document.createElement('div');
+    wishlistNotification.id = 'wishlist-notification';
+    wishlistNotification.style.position = 'fixed';
+    wishlistNotification.style.top = '30px';
+    wishlistNotification.style.right = '30px';
+    wishlistNotification.style.background = '#28a745';
+    wishlistNotification.style.color = 'white';
+    wishlistNotification.style.padding = '16px 32px';
+    wishlistNotification.style.borderRadius = '8px';
+    wishlistNotification.style.fontSize = '1.1rem';
+    wishlistNotification.style.zIndex = '9999';
+    wishlistNotification.style.display = 'none';
+    document.body.appendChild(wishlistNotification);
+
+    function showWishlistNotification(message) {
+      wishlistNotification.textContent = message;
+      wishlistNotification.style.display = 'block';
+      setTimeout(() => {
+        wishlistNotification.style.display = 'none';
+      }, 1000);
+    }
+
+    document.querySelectorAll('.wishlist-btn').forEach(function(button) {
+      button.addEventListener('click', function(event) {
+        const productId = this.dataset.productId;
+        fetch(`/api/wishlist/${productId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            this.classList.toggle('active');
+            // Kalp ikonunu değiştir
+            const icon = this.querySelector('i');
+            if (this.classList.contains('active')) {
+              icon.className = 'fa-solid fa-heart';
+            } else {
+              icon.className = 'fa-regular fa-heart';
+            }
+            showWishlistNotification('Product added to wishlist!');
+          } else if (data.message === 'Please log in first') {
+            window.location.href = '/login';
+          } else {
+            showWishlistNotification(data.message || 'Failed to add to wishlist.');
+          }
+        })
+        .catch(() => {
+          showWishlistNotification('An error occurred while adding to wishlist.');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

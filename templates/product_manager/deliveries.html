@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.delivery-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 1rem; }
+.delivery-card { background: #222; border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+.delivery-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.delivery-header h3 { margin: 0; font-size: 1.2rem; }
+.delivery-header .status { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; text-transform: capitalize; }
+.status.processing { background: #ff9f43; color: #000; }
+.status.in_transit { background: #48dbfb; color: #000; }
+.status.delivered { background: #2ecc71; color: #fff; }
+.delivery-info p, .delivery-info ul { margin: 0.25rem 0; color: #ccc; }
+.delivery-info ul { padding-left: 1.2rem; }
+.delivery-actions { margin-top: 1rem; display: flex; gap: 0.5rem; }
+.delivery-actions .btn { flex: 1; }
+</style>
+
+<div class="container mt-4">
+  <h1 class="mb-4">Manage Deliveries</h1>
+  <div class="delivery-grid">
+    {% for order in orders %}
+    <div class="delivery-card">
+      <div class="delivery-header">
+        <h3>Order #{{ order.id }}</h3>
+        <span class="status {{ order.status }}">{{ order.status.replace('_',' ').title() }}</span>
+      </div>
+      <div class="delivery-info">
+        <p><strong>Customer:</strong> {{ order.user.username }}</p>
+        <p><strong>Address:</strong> {{ order.delivery_address }}</p>
+        <p><strong>Items:</strong></p>
+        <ul>
+          {% for item in order.order_items %}
+          <li>{{ item.product.name }} x{{ item.quantity }}</li>
+          {% endfor %}
+        </ul>
+        <p><strong>Total:</strong> ${{ '%.2f'|format(order.total_price) }}</p>
+      </div>
+      <div class="delivery-actions">
+        {% if order.status == 'processing' %}
+        <button class="btn btn-sm btn-warning set-status" data-id="{{ order.id }}" data-status="in_transit">Mark In Transit</button>
+        {% endif %}
+        {% if order.status in ['processing', 'in_transit'] %}
+        <button class="btn btn-sm btn-success set-status" data-id="{{ order.id }}" data-status="delivered">Mark Delivered</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.set-status').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const orderId = btn.dataset.id;
+      const newStatus = btn.dataset.status;
+      fetch(`/api/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) alert(data.error || 'Error updating status');
+        else location.reload();
+      })
+      .catch(err => {
+        console.error(err);
+        alert('An error occurred');
+      });
+    });
+  });
+});
+</script>
+{% endblock %} 

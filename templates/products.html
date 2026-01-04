@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChipMaster - Products</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* stylelint-disable */
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #1a1a1a;
+      color: #eee;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Header styles from home.html */
+    header {
+      background: #000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 10;
+      padding: 10px 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      overflow: hidden;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff5e62;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li {
+      margin-left: 1.5rem;
+    }
+    .nav-links li a {
+      color: #eee;
+      font-weight: 500;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a:hover {
+      color: #ff5e62;
+    }
+    .nav-links li a ion-icon {
+      margin-right: 0.3rem;
+    }
+
+    /* Products Page Specific Styles */
+    .main-content {
+      padding-top: 80px;
+      min-height: 100vh;
+    }
+
+    .filters {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    .filter-group {
+      margin-bottom: 15px;
+    }
+
+    .filter-group h3 {
+      color: #ff5e62;
+      margin-bottom: 10px;
+    }
+
+    .filter-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: #333;
+      border: none;
+      padding: 8px 15px;
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover {
+      background: #ff5e62;
+    }
+
+    .filter-btn.active {
+      background: #ff5e62;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 20px 0;
+    }
+
+    .product-card {
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 15px;
+    }
+
+    .product-title {
+      font-size: 1.2rem;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .product-price {
+      color: #ff5e62;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      color: #ffd700;
+    }
+
+    .product-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .details-btn {
+      background: #333;
+      color: #fff;
+    }
+
+    .details-btn:hover {
+      background: #444;
+    }
+
+    .cart-btn {
+      background: #ff5e62;
+      color: #fff;
+    }
+
+    .cart-btn:hover {
+      background: #e94057;
+    }
+
+    /* Add new styles for search and sort */
+    .search-sort-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background: #333;
+      color: #fff;
+    }
+
+    /* Update product card styles */
+    .product-card {
+      position: relative;
+    }
+
+    .stock-info {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 0.9rem;
+    }
+
+    .stock-low {
+      color: #ffd700;
+    }
+
+    .stock-out {
+      color: #ff4444;
+    }
+
+    .stock-available {
+      color: #00ff00;
+    }
+
+    .product-details {
+      margin: 10px 0;
+      font-size: 0.9rem;
+      color: #999;
+    }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: auto;
+      height: auto;
+      background: none;
+      border: none;
+      color: #bbb;
+      font-size: 1.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 2;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+    .wishlist-btn:hover {
+      color: #ff5e62;
+      background: none;
+      box-shadow: none;
+    }
+    .wishlist-btn.active {
+      color: #ff5e62;
+      background: none;
+      box-shadow: none;
+    }
+    .wishlist-btn i {
+      font-size: 1.5em;
+      pointer-events: none;
+    }
+    @media (max-width: 600px) {
+      .wishlist-btn {
+        font-size: 1.3rem;
+        top: 10px;
+        left: 10px;
+      }
+    }
+
+    /* Filter and Sort Section */
+    .filter-sort-container {
+      background: #1f1f1f;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 180px;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      color: #ddd;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.75px;
+    }
+
+    .filter-group select {
+      background: #2a2a2a;
+      color: #fff;
+      border: 1px solid #444;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 1rem;
+      width: 100%;
+      appearance: none;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .filter-group select:hover {
+      background: #363636;
+      border-color: #ff5e62;
+    }
+    .filter-group select:focus {
+      outline: none;
+      background: #363636;
+      border-color: #ff5e62;
+      box-shadow: 0 0 0 2px rgba(255,94,98,0.3);
+    }
+    /* stylelint-enable */
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('main.home') }}" class="logo-link">
+          <h1 class="logo-text">ChipMaster</h1>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('main.home') }}"><ion-icon name="home-outline"></ion-icon>Home</a></li>
+          <li><a href="{{ url_for('main.products') }}"><ion-icon name="pricetag-outline"></ion-icon>Products</a></li>
+          <li><a href="{{ url_for('main.cart') }}"><ion-icon name="cart-outline"></ion-icon>My Cart</a></li>
+          <li><a href="{{ url_for('main.wishlist') }}" title="Wishlist"><ion-icon name="heart-outline" style="font-size:1.3rem;"></ion-icon> Wishlist</a></li>
+          {% if session.get('logged_in') %}
+            <li><a href="{{ url_for('main.profile') }}"><ion-icon name="person-outline"></ion-icon>{{ session.get('username', 'User') }}</a></li>
+            <li><a href="{{ url_for('main.logout') }}"><ion-icon name="log-out-outline"></ion-icon>Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('main.login') }}"><ion-icon name="person-outline"></ion-icon>Log In</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container">
+      <!-- Search and Sort -->
+      <div class="search-sort-container">
+        <div class="search-box">
+          <input type="text" class="search-input" placeholder="Search products by name or description...">
+        </div>
+      </div>
+
+      <!-- Filter and Sort Section -->
+      <div class="filter-sort-container">
+        <form method="get" action="{{ url_for('main.products') }}" class="filters">
+        <div class="filter-group">
+            <label for="category">Category:</label>
+            <select name="category" id="category" onchange="this.form.submit()">
+              <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All Categories</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}" {% if selected_category|string == category.id|string %}selected{% endif %}>
+                {{ category.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="price_range">Price Range:</label>
+            <select name="price_range" id="price_range" onchange="this.form.submit()">
+              {% for range in price_ranges %}
+              <option value="{{ range.value }}" {% if selected_price_range == range.value %}selected{% endif %}>
+                {{ range.label }}
+              </option>
+              {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="sort_by">Sort By:</label>
+            <select name="sort_by" id="sort_by" onchange="this.form.submit()">
+              {% for option in sort_options %}
+              <option value="{{ option.value }}" {% if selected_sort == option.value %}selected{% endif %}>
+                {{ option.label }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="product-grid">
+        {% if products %}
+        {% for product in products %}
+        <div class="product-card">
+          <button class="wishlist-btn{% if product.in_wishlist %} active{% endif %}" data-product-id="{{ product.id }}" title="Add to Wishlist">
+            <i class="{% if product.in_wishlist %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+          </button>
+          
+          {% if product.stock_quantity == 0 %}
+          <div class="out-of-stock-overlay">
+            Out of Stock
+          </div>
+          {% endif %}
+          
+          <div class="stock-info {% if product.stock_quantity == 0 %}stock-out{% elif product.stock_quantity < 5 %}stock-low{% else %}stock-available{% endif %}">
+            {% if product.stock_quantity > 0 %}
+              {{ product.stock_quantity }} in stock
+            {% else %}
+              Out of Stock
+            {% endif %}
+          </div>
+          
+          {% if product.image %}
+          <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image">
+          {% else %}
+          <img src="/static/product_images/no-image.png" alt="{{ product.name }}" class="product-image">
+          {% endif %}
+          <div class="product-info">
+            <h3 class="product-title">{{ product.name }}</h3>
+            <div class="product-details">
+              <p>Model: {{ product.model }}</p>
+              <p>Serial: {{ product.serial_number }}</p>
+              <p>Warranty: {{ product.warranty_status }}</p>
+              <p>Distributor: {{ product.distributor }}</p>
+            </div>
+            <div class="product-rating">
+              {% for i in range(product.rating|int) %}
+                <ion-icon name="star"></ion-icon>
+              {% endfor %}
+              {% if product.rating % 1 != 0 %}
+                <ion-icon name="star-half"></ion-icon>
+              {% endif %}
+              <span>({{ product.rating }})</span>
+            </div>
+            {% if product.discounted_price is not none and product.discounted_price < product.price %}
+            <div class="product-price">
+              <span class="original-price" style="text-decoration:line-through;color:#888;font-size:1.1rem;margin-right:8px;">${{ "%.2f"|format(product.price) }}</span>
+              <span class="discount-price" style="color:#ff5e62;font-size:1.3rem;font-weight:bold;">${{ "%.2f"|format(product.discounted_price) }}</span>
+              <span class="discount-badge" style="background:#ff5e62;color:white;padding:2px 8px;border-radius:4px;font-size:0.9rem;font-weight:bold;margin-left:8px;vertical-align:middle;">{{ product.discount_rate }}% OFF</span>
+            </div>
+            {% else %}
+            <p class="product-price">${{ "%.2f"|format(product.price) }}</p>
+            {% endif %}
+            <div class="product-actions">
+              <a href="{{ url_for('main.product_details', product_id=product.id) }}" class="action-btn details-btn">View Details</a>
+              {% if product.stock_quantity > 0 %}
+                <button onclick="addToCart({{ product.id }})" class="action-btn cart-btn">Add to Cart</button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+          <div class="no-products">
+            <p>No products found matching your criteria.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  
+  <script>
+    /* eslint-disable */
+    // Search functionality
+    const searchInput = document.querySelector('.search-input');
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const products = document.querySelectorAll('.product-card');
+      
+      products.forEach(product => {
+        const title = product.querySelector('.product-title').textContent.toLowerCase();
+        const details = product.querySelector('.product-details').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || details.includes(searchTerm)) {
+          product.style.display = '';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    });
+
+    // Add to Wishlist functionality
+    // Bildirim kutusu ekle
+    const wishlistNotification = document.createElement('div');
+    wishlistNotification.id = 'wishlist-notification';
+    wishlistNotification.style.position = 'fixed';
+    wishlistNotification.style.top = '30px';
+    wishlistNotification.style.right = '30px';
+    wishlistNotification.style.background = '#28a745';
+    wishlistNotification.style.color = 'white';
+    wishlistNotification.style.padding = '16px 32px';
+    wishlistNotification.style.borderRadius = '8px';
+    wishlistNotification.style.fontSize = '1.1rem';
+    wishlistNotification.style.zIndex = '9999';
+    wishlistNotification.style.display = 'none';
+    document.body.appendChild(wishlistNotification);
+
+    function showWishlistNotification(message) {
+        wishlistNotification.textContent = message;
+        wishlistNotification.style.display = 'block';
+        setTimeout(() => {
+            wishlistNotification.style.display = 'none';
+        }, 1000);
+    }
+
+    document.querySelectorAll('.wishlist-btn').forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            const productId = this.dataset.productId;
+            fetch(`/api/wishlist/${productId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.classList.toggle('active');
+                    // Kalp ikonunu değiştir
+                    const icon = this.querySelector('i');
+                    if (this.classList.contains('active')) {
+                        icon.className = 'fa-solid fa-heart';
+                    } else {
+                        icon.className = 'fa-regular fa-heart';
+                    }
+                    showWishlistNotification('Product added to wishlist!');
+                } else if (data.message === 'Please log in first') {
+                    window.location.href = '/login';
+                } else {
+                    showWishlistNotification(data.message || 'Failed to add to wishlist.');
+                }
+            })
+            .catch(() => {
+                showWishlistNotification('An error occurred while adding to wishlist.');
+            });
+        });
+    });
+
+    function addToCart(productId) {
+      fetch(`/api/cart/add/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Product added to cart successfully!');
+        } else {
+          alert(data.message || 'Failed to add product to cart');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding the product to cart');
+      });
+    }
+    /* eslint-enable */
+  </script>
+</body>
+</html> 

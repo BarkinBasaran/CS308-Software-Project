@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChipMaster - Shopping Cart</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #1a1a1a;
+      color: #eee;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Header styles */
+    header {
+      background: #000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 10;
+      padding: 10px 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      overflow: hidden;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff5e62;
+      transition: transform 0.3s ease-in-out;
+    }
+    .logo-text:hover {
+      transform: scale(1.1);
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li {
+      margin-left: 1.5rem;
+    }
+    .nav-links li a {
+      color: #eee;
+      font-weight: 500;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a:hover {
+      color: #ff5e62;
+    }
+    .nav-links li a ion-icon {
+      margin-right: 0.3rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 100px 0 50px;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Cart Styles */
+    .cart-container {
+      background: #222;
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .cart-title {
+      color: #ff5e62;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .cart-empty {
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .cart-empty p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: #999;
+    }
+
+    .cart-empty a {
+      display: inline-block;
+      background: #ff5e62;
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .cart-empty a:hover {
+      background: #e94057;
+    }
+
+    .cart-items {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+      background: #333;
+      padding: 1rem;
+      border-radius: 5px;
+    }
+
+    .cart-item img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .item-details h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .item-details p {
+      color: #999;
+      margin-bottom: 0.3rem;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .quantity-btn {
+      background: #444;
+      border: none;
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .quantity-btn:hover {
+      background: #555;
+    }
+
+    .quantity-input {
+      width: 50px;
+      text-align: center;
+      background: #444;
+      border: none;
+      color: #fff;
+      padding: 0.3rem;
+      border-radius: 5px;
+    }
+
+    .remove-btn {
+      background: #e94057;
+      border: none;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .remove-btn:hover {
+      background: #d63447;
+    }
+
+    .cart-summary {
+      background: #333;
+      padding: 1.5rem;
+      border-radius: 5px;
+      margin-top: 2rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #444;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .summary-row.total {
+      color: #ff5e62;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .checkout-btn {
+      display: block;
+      width: 100%;
+      background: #ff5e62;
+      color: #fff;
+      border: none;
+      padding: 1rem;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 1.5rem;
+    }
+
+    .checkout-btn:hover {
+      background: #e94057;
+    }
+
+    .checkout-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+
+    /* Footer */
+    footer {
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .product-image-link {
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .product-image-link:hover {
+      transform: scale(1.05);
+    }
+    
+    .product-name-link {
+      color: #eee;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .product-name-link:hover {
+      color: #ff5e62;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('main.home') }}" class="logo-link">
+          <h1 class="logo-text">ChipMaster</h1>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('main.home') }}"><ion-icon name="home-outline"></ion-icon>Home</a></li>
+          <li><a href="{{ url_for('main.products') }}"><ion-icon name="pricetag-outline"></ion-icon>Products</a></li>
+          <li><a href="{{ url_for('main.cart') }}"><ion-icon name="cart-outline"></ion-icon>My Cart</a></li>
+          <li><a href="{{ url_for('main.wishlist') }}" title="Wishlist"><ion-icon name="heart-outline" style="font-size:1.3rem;"></ion-icon> Wishlist</a></li>
+          {% if session.get('logged_in') %}
+            <li><a href="{{ url_for('main.profile') }}"><ion-icon name="person-outline"></ion-icon>{{ session.get('username', 'User') }}</a></li>
+            <li><a href="{{ url_for('main.logout') }}"><ion-icon name="log-out-outline"></ion-icon>Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('main.login') }}"><ion-icon name="person-outline"></ion-icon>Log In</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="container">
+      <div class="cart-container">
+        <h1 class="cart-title">Shopping Cart</h1>
+        
+        {% if cart_items %}
+        <div class="cart-items">
+          {% for item in cart_items %}
+          <div class="cart-item" id="cart-item-{{ item.id }}">
+            <img src="{{ item.image_url }}" alt="{{ item.name }}">
+            <div class="item-details">
+              <h3>{{ item.name }}</h3>
+              <p>Model: {{ item.model }}</p>
+              <p>Price: 
+                {% if item.discounted_price is not none and item.discounted_price < item.price %}
+                  <span class="original-price" style="text-decoration:line-through;color:#888;">${{ '%.2f'|format(item.price) }}</span>
+                  <span class="discount-price" style="color:#ff5e62;font-weight:bold;">${{ '%.2f'|format(item.discounted_price) }}</span>
+                {% else %}
+                  <span class="discount-price">${{ '%.2f'|format(item.price) }}</span>
+                {% endif %}
+              </p>
+              <div class="quantity-controls">
+                <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, -1)">-</button>
+                <input type="number" class="quantity-input" id="quantity-{{ item.id }}" value="{{ item.quantity }}" min="1" max="{{ item.stock_quantity }}" readonly>
+                <button class="quantity-btn" onclick="updateQuantity({{ item.id }}, 1)">+</button>
+              </div>
+            </div>
+            <button class="remove-btn" onclick="removeItem({{ item.id }})">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="cart-summary">
+          <div class="summary-item">
+            <span>Subtotal:</span>
+            <span>${{ "%.2f"|format(subtotal) }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Shipping:</span>
+            <span>Free</span>
+          </div>
+          <div class="summary-item total">
+            <span>Total:</span>
+            <span>${{ "%.2f"|format(total) }}</span>
+          </div>
+          <a href="{{ url_for('main.checkout') }}" class="checkout-btn">Proceed to Checkout</a>
+        </div>
+        {% else %}
+        <div class="cart-empty">
+          <p>Your cart is empty</p>
+          <a href="{{ url_for('main.products') }}">Continue Shopping</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 ChipMaster. All rights reserved.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script>
+    function updateQuantity(itemId, change) {
+      const quantityInput = document.querySelector(`#quantity-${itemId}`);
+      let newQuantity = parseInt(quantityInput.value) + change;
+      
+      if (newQuantity < 1) {
+        newQuantity = 1;
+      }
+      
+      fetch(`/api/cart/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: newQuantity })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          quantityInput.value = newQuantity;
+          location.reload();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the quantity');
+      });
+    }
+
+    function removeItem(itemId) {
+      fetch(`/api/cart/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const itemElement = document.querySelector(`#cart-item-${itemId}`);
+          if (itemElement) {
+            itemElement.remove();
+          }
+          location.reload();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while removing the item');
+      });
+    }
+  </script>
+</body>
+</html> 

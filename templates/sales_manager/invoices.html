@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .invoice-container {
+    background: #181818;
+    border-radius: 16px;
+    padding: 32px 24px;
+    max-width: 900px;
+    margin: 40px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  }
+  .invoice-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ff5e62;
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #222;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 1.05rem;
+  }
+  .invoice-table th, .invoice-table td {
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .invoice-table th {
+    background: #292929;
+    color: #ff5e62;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #333;
+  }
+  .invoice-table tr:nth-child(even) {
+    background: #232323;
+  }
+  .invoice-table tr:nth-child(odd) {
+    background: #1a1a1a;
+  }
+  .invoice-table td {
+    color: #eee;
+    border-bottom: 1px solid #292929;
+  }
+  .invoice-table tr:hover {
+    background: #282828;
+    transition: background 0.2s;
+  }
+  .download-btn {
+    background: #ff5e62;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(255,94,98,0.08);
+  }
+  .download-btn:hover {
+    background: #e94057;
+    box-shadow: 0 4px 16px rgba(255,94,98,0.15);
+  }
+  @media (max-width: 700px) {
+    .invoice-container { padding: 12px 2px; }
+    .invoice-title { font-size: 1.3rem; }
+    .invoice-table th, .invoice-table td { padding: 8px 4px; font-size: 0.95rem; }
+  }
+</style>
+<div class="invoice-container">
+  <div class="invoice-title">Invoices</div>
+  <table class="invoice-table" id="invoices-table">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Date</th>
+        <th>Total</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div id="loading" style="text-align:center;color:#ff5e62;font-weight:600;margin:18px 0;display:none;">Loading more invoices...</div>
+  <div id="end-of-list" style="text-align:center;color:#aaa;margin:18px 0;display:none;">No more invoices.</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let offset = 0;
+const limit = 20;
+let loading = false;
+let endReached = false;
+const tbody = document.querySelector('#invoices-table tbody');
+const loadingDiv = document.getElementById('loading');
+const endDiv = document.getElementById('end-of-list');
+
+function addInvoices(invoices) {
+  invoices.forEach(inv => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${inv.order_id}</td>
+      <td>${inv.customer_name}</td>
+      <td>${new Date(inv.order_date).toLocaleDateString()}</td>
+      <td>$${inv.total_price.toFixed(2)}</td>
+      <td>
+        <button class="download-btn" data-id="${inv.order_id}">Download</button>
+        <button class="download-btn" style="background:#292929;color:#ff5e62;margin-left:8px;" data-id="${inv.order_id}" data-view="1">View</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  // Attach event listeners
+  document.querySelectorAll('.download-btn').forEach(btn => {
+    btn.onclick = function() {
+      const orderId = this.dataset.id;
+      if (this.dataset.view) {
+        window.open(`/api/invoices/${orderId}/pdf`, '_blank');
+      } else {
+        // Download PDF
+        const link = document.createElement('a');
+        link.href = `/api/invoices/${orderId}/pdf`;
+        link.download = `invoice_${orderId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    };
+  });
+}
+
+function loadInvoices() {
+  if (loading || endReached) return;
+  loading = true;
+  loadingDiv.style.display = 'block';
+  fetch(`/api/invoices?limit=${limit}&offset=${offset}`)
+    .then(res => res.json())
+    .then(data => {
+      loadingDiv.style.display = 'none';
+      if (!data.success) return alert(data.error || 'Error fetching invoices');
+      if (data.invoices.length === 0) {
+        endReached = true;
+        endDiv.style.display = 'block';
+        return;
+      }
+      addInvoices(data.invoices);
+      offset += data.invoices.length;
+      loading = false;
+    });
+}
+
+// Infinite scroll
+window.addEventListener('scroll', function() {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+    loadInvoices();
+  }
+});
+// Initial load
+loadInvoices();
+</script>
+{% endblock %} 

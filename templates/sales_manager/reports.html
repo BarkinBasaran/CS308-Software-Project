@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1>Revenue & Profit Report</h1>
+  <div class="form-inline mt-3 mb-3">
+    <label for="period-select" style="font-weight:600;margin-right:10px;">Period:</label>
+    <select id="period-select" class="form-control" style="width:auto;display:inline-block;">
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly" selected>Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+  </div>
+  <div id="report-summary" class="mb-4">
+    <p>Total Orders: <span id="total-orders">-</span></p>
+    <p>Total Revenue: $<span id="total-revenue">-</span></p>
+    <p>Total Cost: $<span id="total-cost">-</span></p>
+    <p>Profit: $<span id="profit">-</span></p>
+  </div>
+  <canvas id="report-chart" width="800" height="400"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function fetchReport(period) {
+  fetch(`/api/reports/profit-loss?period=${period}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return alert(data.error || 'Error fetching report');
+      const rpt = data.report;
+      document.getElementById('total-orders').textContent = rpt.total_orders;
+      document.getElementById('total-revenue').textContent = rpt.total_revenue.toFixed(2);
+      document.getElementById('total-cost').textContent = rpt.total_cost.toFixed(2);
+      document.getElementById('profit').textContent = rpt.profit.toFixed(2);
+      const labels = rpt.chart_data.map(d => d.date);
+      const revenues = rpt.chart_data.map(d => d.revenue);
+      const costs = rpt.chart_data.map(d => d.cost);
+      const profits = rpt.chart_data.map(d => d.profit);
+      const ctx = document.getElementById('report-chart').getContext('2d');
+      if (window.chart) window.chart.destroy();
+      window.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Revenue', data: revenues, borderColor: '#28a745', backgroundColor: '#28a745', fill: false, tension: 0.1 },
+            { label: 'Cost', data: costs, borderColor: '#dc3545', backgroundColor: '#dc3545', fill: false, tension: 0.1 },
+            { label: 'Profit', data: profits, borderColor: '#ffc107', backgroundColor: '#ffc107', fill: false, tension: 0.1 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: '#eee' } }
+          },
+          scales: {
+            x: {
+              display: true,
+              ticks: { color: '#ccc' },
+              grid: { color: '#444' }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#ccc' },
+              grid: { color: '#444' }
+            }
+          }
+        }
+      });
+    });
+}
+// On page load, fetch monthly report
+window.addEventListener('DOMContentLoaded', function() {
+  fetchReport('monthly');
+  document.getElementById('period-select').addEventListener('change', function() {
+    fetchReport(this.value);
+  });
+});
+</script>
+{% endblock %} 

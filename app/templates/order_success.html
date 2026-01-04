@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="card p-5">
+        <div class="mb-4">
+            <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+        </div>
+        <h1 class="display-4 mb-4">Order Successful!</h1>
+        <p class="lead mb-4">Thank you for your purchase. Your order has been successfully placed.</p>
+        <p class="mb-4">Order #{{ order.id }}</p>
+        <p class="mb-4">Total: ${{ "%.2f"|format(order.total_price) }}</p>
+        <div class="mt-4">
+            <a href="{{ url_for('main.orders') }}" class="btn btn-primary me-2">View My Orders</a>
+            <a href="{{ url_for('main.products') }}" class="btn btn-outline-secondary">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+{% if items %}
+  <div class="container mt-5">
+    <h3 class="mb-4 text-center">Rate Your Purchased Products</h3>
+    {% for item in items %}
+      <div class="card mb-4">
+        <div class="row g-0 align-items-center">
+          <div class="col-md-2">
+            <img src="{{ item.image }}" class="img-fluid p-2" alt="{{ item.name }}">
+          </div>
+          <div class="col-md-10">
+            <div class="card-body">
+              <h5 class="card-title">{{ item.name }}</h5>
+              {% if item.can_rate %}
+                <div class="rating-form" data-product-id="{{ item.id }}">
+                  <!-- Rating icons row -->
+                  <div class="d-flex justify-content-center mb-2">
+                    {% for i in range(1, 6) %}
+                      <i class="fas fa-star fa-2x text-warning mx-1"></i>
+                    {% endfor %}
+                  </div>
+                  <div class="stars-select">
+                    {% for i in range(1, 6) %}
+                      <input type="radio" id="star-{{ item.id }}-{{ i }}" name="rating-{{ item.id }}" value="{{ i }}">
+                      <label for="star-{{ item.id }}-{{ i }}"><i class="fas fa-star text-warning"></i></label>
+                    {% endfor %}
+                  </div>
+                  <textarea class="form-control mt-2" placeholder="Leave a comment"></textarea>
+                  <button class="btn btn-primary mt-2 submit-rating">Submit Rating</button>
+                </div>
+              {% else %}
+                <p class="text-success">You have already rated this product.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <script>
+  document.querySelectorAll('.submit-rating').forEach(btn => {
+      btn.addEventListener('click', function() {
+          const form = this.closest('.rating-form');
+          const productId = form.dataset.productId;
+          const ratingInput = form.querySelector('input[name="rating-'+productId+'"]:checked');
+          const comment = form.querySelector('textarea').value.trim();
+          if (!ratingInput || !comment) {
+              alert('Please select a rating and enter a comment.');
+              return;
+          }
+          fetch('/api/reviews/'+productId, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ rating: parseInt(ratingInput.value), comment: comment })
+          })
+          .then(res => res.json())
+          .then(data => {
+              if (data.success) {
+                  form.innerHTML = '<p class="text-success">Thank you for your feedback!</p>';
+              } else {
+                  alert(data.message || 'Error submitting rating.');
+              }
+          }).catch(err => {
+              console.error(err);
+              alert('Error submitting rating.');
+          });
+      });
+  });
+  </script>
+{% endif %}
+{% endblock %} 

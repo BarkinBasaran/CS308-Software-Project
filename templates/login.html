@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Log In</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Genel stil */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+    }
+
+    /* Form kabı */
+    .center-container {
+      width: 400px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    /* Logo - Tıklanabilir */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo-link {
+      text-decoration: none;
+    }
+    .logo-text {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #e94057;
+      transition: transform 0.3s ease-in-out;
+    }
+    .logo-text:hover {
+      transform: scale(1.1);
+    }
+
+    /* Form başlığı */
+    .login-form h2 {
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    /* Giriş alanları */
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .input-group label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #333;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+    }
+
+    /* Hata mesajları */
+    .error {
+      color: #ff4444;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* Giriş butonu */
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: #e94057;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .btn-login:hover {
+      transform: scale(1.05);
+    }
+
+    /* Linkler */
+    .forgot-link, .register-btn {
+      display: block;
+      margin: 10px 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: #0074D9;
+      font-weight: 500;
+    }
+    .forgot-link:hover, .register-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Giriş Formu -->
+  <div class="center-container">
+    <div class="logo-area">
+      <a href="home" class="logo-link">
+        <div class="logo-text">ChipMaster</div>
+      </a>
+    </div>
+
+    <form method="POST" action="/login" class="login-form">
+      <h2>Log In</h2>
+
+      <!-- Email Girişi -->
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+      </div>
+
+      <!-- Şifre Girişi -->
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Your password" required minlength="6">
+      </div>
+
+      <!-- Hata mesajları -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="error">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <!-- Şifremi Unuttum ve Kayıt Ol Butonları -->
+      <a href="forgotpassword" class="forgot-link">Forgot My Password?</a>
+      <button type="submit" class="btn-login">Log In</button>
+      <a href="register" class="register-btn">Not a member? Sign Up</a>
+    </form>
+  </div>
+
+</body>
+</html>

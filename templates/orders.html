@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  header {
+    background: #000 !important;
+  }
+  .orders-title {
+    color: #ff5e62;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    margin-bottom: 2rem;
+    text-align: left;
+    border-left: 5px solid #ff5e62;
+    padding-left: 18px;
+  }
+  .order-card {
+    background: #181a1b;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    border: 1px solid #232323;
+    margin-bottom: 2.2rem;
+    transition: box-shadow 0.2s, border 0.2s;
+    padding: 0;
+  }
+  .order-card:hover {
+    box-shadow: 0 8px 32px rgba(255,94,98,0.10);
+    border: 1.5px solid #ff5e62;
+  }
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #181a1b;
+    border-radius: 14px 14px 0 0;
+    padding: 1.1rem 2rem 0.7rem 2rem;
+    border-bottom: 1px solid #232323;
+  }
+  .order-header h5 {
+    color: #ff5e62;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+  }
+  .order-header small {
+    color: #aaa;
+    font-size: 0.95rem;
+  }
+  .order-status {
+    font-size: 0.98rem;
+    font-weight: 600;
+    padding: 0.3rem 1.1rem;
+    border-radius: 20px;
+    background: #232323;
+    color: #ffb347;
+    border: 1px solid #333;
+    margin-left: 1rem;
+  }
+  .order-status.completed {
+    background: #223c2c;
+    color: #4be37a;
+    border: 1px solid #2e7d4f;
+  }
+  .order-body {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1.5rem 2rem 1.5rem 2rem;
+    gap: 2rem;
+    background: #181a1b;
+    border-radius: 0 0 14px 14px;
+  }
+  .order-items {
+    flex: 2 1 350px;
+    min-width: 300px;
+  }
+  .order-details {
+    flex: 1 1 220px;
+    min-width: 200px;
+    padding-left: 1.5rem;
+    border-left: 1px solid #232323;
+  }
+  .order-details h6 {
+    color: #ff5e62;
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+  }
+  .order-details p {
+    color: #eee;
+    font-size: 0.98rem;
+    margin-bottom: 1.2rem;
+  }
+  .order-details .order-status {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  .table {
+    background: #181a1b !important;
+    color: #eee !important;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .table th, .table td {
+    border-color: #232323 !important;
+    color: #eee !important;
+    font-size: 0.98rem;
+    vertical-align: middle;
+  }
+  .table thead th {
+    background: #232323 !important;
+    color: #ff5e62 !important;
+    border-bottom: 2px solid #333 !important;
+    font-size: 1.01rem;
+    font-weight: 600;
+  }
+  .order-total-row td {
+    color: #ff5e62 !important;
+    font-weight: bold;
+    font-size: 1.08rem;
+    background: #181a1b !important;
+  }
+  @media (max-width: 900px) {
+    .order-body {
+      flex-direction: column;
+      gap: 1.2rem;
+      padding: 1.2rem 1rem;
+    }
+    .order-details {
+      padding-left: 0;
+      border-left: none;
+      border-top: 1px solid #232323;
+      margin-top: 1.2rem;
+    }
+  }
+  .pretty-cancel-btn {
+    background: #e94057;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 0.6rem 1.6rem;
+    font-weight: 600;
+    font-size: 1.08rem;
+    box-shadow: 0 2px 8px rgba(233,64,87,0.10);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .pretty-cancel-btn:hover {
+    background: #b71c1c;
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(233,64,87,0.18);
+  }
+</style>
+<div class="container my-5">
+    <div id="return-success-message" style="display:none; background:#223c2c; color:#4be37a; border-radius:7px; padding:1rem 1.5rem; margin-bottom:1.5rem; font-weight:600; text-align:center; font-size:1.1rem;">Return request submitted!</div>
+    <h2 class="orders-title">My Orders</h2>
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <div>
+                    <h5>Order #{{ order.id }}</h5>
+                    <small>Placed on {{ order.created_at.strftime('%B %d, %Y') }}</small>
+                </div>
+                <span class="order-status {% if order.status == 'completed' %}completed{% endif %}">
+                    {{ order.status.title() }}
+                </span>
+            </div>
+            <div class="order-body">
+                <div class="order-items">
+                    <h6 style="color:#ff5e62; font-weight:600;">Items:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="width:60px;">Image</th>
+                                    <th>Product</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.order_items %}
+                                <tr>
+                                    <td>
+                                      {% if item.product.image %}
+                                      <img src="{{ item.product.image }}" alt="{{ item.product.name }}" style="width:48px; height:48px; object-fit:cover; border-radius:7px; border:1px solid #232323; background:#232323;">
+                                      {% else %}
+                                      <img src="/static/product_images/no-image.png" alt="{{ item.product.name }}" style="width:48px; height:48px; object-fit:cover; border-radius:7px; border:1px solid #232323; background:#232323;">
+                                      {% endif %}
+                                    </td>
+                                    <td style="font-weight:600; color:#ff5e62;">{{ item.product.name }}</td>
+                                    <td style="color:#bbb; font-size:0.97rem;">{{ item.product.description }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                                    <td>${{ "%.2f"|format(item.total_price) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="order-total-row">
+                                    <td colspan="5" class="text-end">Order Total:</td>
+                                    <td>${{ "%.2f"|format(order.total_price) }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="order-details">
+                    <h6>Delivery Address:</h6>
+                    <p>{{ order.delivery_address }}</p>
+                    <h6>Payment Status:</h6>
+                    <span class="order-status {% if order.payment_status == 'completed' %}completed{% endif %}">
+                        {{ order.payment_status.title() }}
+                    </span>
+                </div>
+            </div>
+            {% if order.can_be_returned %}
+            <div class="text-center" style="padding: 1rem 2rem; display: flex; gap: 1rem; justify-content: center;">
+                <a href="{{ url_for('main.order_success', order_id=order.id) }}" class="btn btn-sm btn-primary" style="background-color:#ff5e62; border:none;">Rate Your Products</a>
+                <button class="btn btn-sm btn-warning request-return-btn" data-order-id="{{ order.id }}" style="color:#222; font-weight:600;">Request Return</button>
+            </div>
+            {% elif order.status == 'delivered' %}
+            <div class="text-center" style="padding: 1rem 2rem; display: flex; gap: 1rem; justify-content: center;">
+                <a href="{{ url_for('main.order_success', order_id=order.id) }}" class="btn btn-sm btn-primary" style="background-color:#ff5e62; border:none;">Rate Your Products</a>
+            </div>
+            {% elif order.status == 'processing' %}
+            <div class="text-center" style="padding: 1rem 2rem; display: flex; gap: 1rem; justify-content: center;">
+                <button class="pretty-cancel-btn cancel-order-btn" data-order-id="{{ order.id }}">
+                    <ion-icon name="close-circle-outline" style="vertical-align:middle; font-size:1.2em; margin-right:6px;"></ion-icon>
+                    Cancel Order
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <p class="mb-0">You haven't placed any orders yet. <a href="{{ url_for('main.products') }}" style="color:#ff5e62;">Start shopping</a></p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Return Request Modal -->
+<div class="modal" id="returnModal" tabindex="-1" style="display:none; background:rgba(0,0,0,0.7); position:fixed; top:0; left:0; width:100vw; height:100vh; align-items:center; justify-content:center; z-index:9999;">
+  <div style="background:#222; border-radius:10px; padding:2rem; min-width:320px; max-width:90vw; box-shadow:0 2px 16px #0008; color:#fff;">
+    <h4>Request a Return</h4>
+    <form id="returnForm">
+      <input type="hidden" id="returnOrderId">
+      <div class="form-group mb-3">
+        <label for="returnProduct">Product</label>
+        <select id="returnProduct" class="form-control" required></select>
+      </div>
+      <div class="form-group mb-3">
+        <label for="returnQty">Quantity</label>
+        <input type="number" id="returnQty" class="form-control" min="1" required>
+      </div>
+      <div class="form-group mb-3">
+        <label for="returnReason">Reason</label>
+        <input type="text" id="returnReason" class="form-control" required>
+      </div>
+      <div style="display:flex; gap:1rem; justify-content:flex-end;">
+        <button type="button" class="btn btn-secondary" id="returnCancel">Cancel</button>
+        <button type="submit" class="btn btn-success">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Return Request Modal Logic
+let orderItemsMap = {};
+{% for order in orders %}
+  orderItemsMap[{{ order.id }}] = [
+    {% for item in order.order_items %}
+      {id: {{ item.product.id }}, name: "{{ item.product.name|replace('"', '\"') }}", max: {{ item.quantity }}},
+    {% endfor %}
+  ];
+{% endfor %}
+const modal = document.getElementById('returnModal');
+const form = document.getElementById('returnForm');
+const prodSelect = document.getElementById('returnProduct');
+const qtyInput = document.getElementById('returnQty');
+const reasonInput = document.getElementById('returnReason');
+let currentOrderId = null;
+document.querySelectorAll('.request-return-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentOrderId = btn.dataset.orderId;
+    document.getElementById('returnOrderId').value = currentOrderId;
+    // Populate product select
+    prodSelect.innerHTML = '';
+    (orderItemsMap[currentOrderId] || []).forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.name;
+      opt.dataset.max = item.max;
+      prodSelect.appendChild(opt);
+    });
+    qtyInput.value = 1;
+    qtyInput.max = prodSelect.options[0]?.dataset.max || 1;
+    modal.style.display = 'flex';
+  });
+});
+prodSelect.onchange = function() {
+  const max = prodSelect.options[prodSelect.selectedIndex]?.dataset.max || 1;
+  qtyInput.max = max;
+  qtyInput.value = 1;
+};
+document.getElementById('returnCancel').onclick = () => { modal.style.display = 'none'; };
+form.onsubmit = function(e) {
+  e.preventDefault();
+  fetch('/api/returns', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      order_id: currentOrderId,
+      product_id: prodSelect.value,
+      quantity: qtyInput.value,
+      reason: reasonInput.value
+    }),
+    credentials: 'same-origin'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) alert(data.error || 'Error submitting return request');
+    else {
+      modal.style.display = 'none';
+      const msg = document.getElementById('return-success-message');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 3000);
+    }
+  });
+};
+modal.onclick = function(e) { if (e.target === modal) modal.style.display = 'none'; };
+
+// Cancel Order
+Array.from(document.getElementsByClassName('cancel-order-btn')).forEach(btn => {
+  btn.addEventListener('click', () => {
+    const orderId = btn.dataset.orderId;
+    if (confirm('Are you sure you want to cancel this order?')) {
+      fetch(`/api/orders/${orderId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) alert(data.message || 'Order could not be cancelled.');
+        else location.reload();
+      });
+    }
+  });
+});
+</script>
+{% endblock %} 

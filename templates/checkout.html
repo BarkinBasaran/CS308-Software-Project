@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - ChipMaster</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #1a1a1a;
+      color: #eee;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    /* Main Header (Same as in the main page) */
+    header {
+      background: #000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 10;
+      padding: 10px 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      overflow: hidden;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-link {
+      text-decoration: none;
+    }
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff5e62;
+      transition: transform 0.3s ease-in-out;
+      display: inline-block;
+    }
+    .logo-text:hover {
+      transform: scale(1.1);
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li {
+      margin-left: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a {
+      color: #eee;
+      font-weight: 500;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+    }
+    .nav-links li a ion-icon {
+      font-size: 1.2rem;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+    }
+    .nav-links li a:hover {
+      color: #ff5e62;
+    }
+    
+    /* Checkout Specific Styles */
+    /* Padding top for fixed header */
+    .main-content {
+      padding-top: 90px;
+      min-height: 100vh;
+    }
+    .checkout-title {
+      color: #ff5e62;
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: #222;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    .card-header {
+      background: #2d2d2d;
+      padding: 1rem;
+      border-bottom: 1px solid #333;
+    }
+    .card-header h5 {
+      color: #ff5e62;
+      font-weight: 600;
+      margin: 0;
+    }
+    .card-body {
+      padding: 1rem;
+    }
+    .table {
+      color: #eee;
+    }
+    .table th,
+    .table td {
+      border-color: #333;
+    }
+    .add-new-btn {
+      background: none;
+      border: 1px solid #ff5e62;
+      color: #ff5e62;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    .add-new-btn:hover {
+      background: #ff5e62;
+      color: #fff;
+    }
+    .place-order-btn {
+      background: #ff5e62;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      width: 100%;
+      margin-top: 1.5rem;
+      transition: all 0.3s;
+    }
+    .place-order-btn:hover {
+      background: #e94057;
+      transform: translateY(-2px);
+    }
+    .product-image {
+      max-width: 80px;
+      height: auto;
+      border-radius: 4px;
+      border: 1px solid #333;
+    }
+    .order-total {
+      color: #eee;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #444;
+    }
+    .total-row:last-child {
+      border-bottom: none;
+      font-weight: 600;
+    }
+    .total-row .amount {
+      color: #ff5e62;
+    }
+    /* Modal & Form Styles (Address & Card) */
+    .modal .modal-content {
+      background-color: #222;
+      color: #eee;
+      border-radius: 10px;
+    }
+    .modal-title {
+      color: #ff5e62;
+    }
+    .btn-close {
+      filter: invert(1);
+    }
+    .form-control,
+    .form-select {
+      background-color: #333;
+      border: 1px solid #444;
+      color: #fff;
+    }
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #ff5e62;
+      box-shadow: 0 0 0 0.25rem rgba(255, 94, 98, 0.25);
+    }
+    .alert {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Updated Navigation Bar (Same as main page) -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('main.home') }}" class="logo-link">
+          <h1 class="logo-text">ChipMaster</h1>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('main.home') }}"><ion-icon name="home-outline"></ion-icon>Home</a></li>
+          <li><a href="{{ url_for('main.products') }}"><ion-icon name="pricetag-outline"></ion-icon>Products</a></li>
+          <li><a href="{{ url_for('main.cart') }}"><ion-icon name="cart-outline"></ion-icon>My Cart</a></li>
+          <li><a href="{{ url_for('main.wishlist') }}" title="Wishlist"><ion-icon name="heart-outline" style="font-size:1.3rem;"></ion-icon> Wishlist</a></li>
+          {% if session.get('logged_in') %}
+            <li><a href="{{ url_for('main.profile') }}"><ion-icon name="person-outline"></ion-icon>{{ session.get('username', 'User') }}</a></li>
+            <li><a href="{{ url_for('main.logout') }}"><ion-icon name="log-out-outline"></ion-icon>Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('main.login') }}"><ion-icon name="person-outline"></ion-icon>Log In</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Checkout Content -->
+  <div class="main-content">
+    <div class="container">
+      <h1 class="checkout-title">Checkout</h1>
+      
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">
+              <h5>Order Summary</h5>
+            </div>
+            <div class="card-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in cart_items %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="product-image me-3">
+                        <span class="product-name">{{ item.product.name }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      {% if item.product.discounted_price is not none and item.product.discounted_price < item.product.price %}
+                        <span class="original-price" style="text-decoration:line-through;color:#888;">${{ '%.2f'|format(item.product.price) }}</span>
+                        <span class="discount-price" style="color:#ff5e62;font-weight:bold;">${{ '%.2f'|format(item.product.discounted_price) }}</span>
+                      {% else %}
+                        <span class="discount-price">${{ '%.2f'|format(item.product.price) }}</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ '%.2f'|format(item.total) }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5>Shipping Address</h5>
+              <button class="add-new-btn" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                Add New Address
+              </button>
+            </div>
+            <div class="card-body">
+              {% if addresses %}
+              <form id="checkoutForm" action="{{ url_for('main.checkout') }}" method="POST">
+                <select name="shipping_address" class="form-select mb-3" required>
+                  <option value="">Select shipping address</option>
+                  {% for address in addresses %}
+                  <option value="{{ address.id }}">
+                    {{ address.full_name }} - {{ address.street_address }}, {{ address.city }}, {{ address.state }} {{ address.postal_code }}
+                  </option>
+                  {% endfor %}
+                </select>
+                
+                <div class="card-header d-flex justify-content-between align-items-center mt-4">
+                  <h5>Payment Method</h5>
+                  <button type="button" class="add-new-btn" data-bs-toggle="modal" data-bs-target="#addCardModal">
+                    Add New Card
+                  </button>
+                </div>
+                
+                <select name="credit_card" class="form-select mb-3 mt-3" required>
+                  <option value="">Select payment method</option>
+                  {% for card in credit_cards %}
+                  <option value="{{ card.id }}">
+                    {{ card.card_type }} ending in {{ card.last_four }}
+                  </option>
+                  {% endfor %}
+                </select>
+                
+                <button type="submit" class="place-order-btn" id="place-order-btn">Place Order</button>
+              </form>
+              {% else %}
+              <div class="alert alert-warning">
+                Please add a shipping address and payment method to your profile before checking out.
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>Order Total</h5>
+            </div>
+            <div class="card-body">
+              <div class="order-total">
+                <div class="total-row">
+                  <span>Subtotal:</span>
+                  <span class="amount">${{ "%.2f"|format(subtotal) }}</span>
+                </div>
+                <div class="total-row">
+                  <span>Shipping:</span>
+                  <span class="amount">${{ "%.2f"|format(shipping_cost) }}</span>
+                </div>
+                <div class="total-row">
+                  <span>Tax (18%):</span>
+                  <span class="amount">${{ "%.2f"|format(tax) }}</span>
+                </div>
+                <div class="total-row">
+                  <span>Total:</span>
+                  <span class="amount">${{ "%.2f"|format(total) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Address Modal -->
+  <div class="modal fade" id="addAddressModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addressForm" action="{{ url_for('main.api_add_address') }}" method="POST">
+            <div class="mb-3">
+              <label for="full_name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="full_name" name="full_name" required>
+            </div>
+            <div class="mb-3">
+              <label for="street_address" class="form-label">Street Address</label>
+              <input type="text" class="form-control" id="street_address" name="street_address" required>
+            </div>
+            <div class="mb-3">
+              <label for="city" class="form-label">City</label>
+              <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+            <div class="mb-3">
+              <label for="state" class="form-label">State</label>
+              <input type="text" class="form-control" id="state" name="state" required>
+            </div>
+            <div class="mb-3">
+              <label for="postal_code" class="form-label">Postal Code</label>
+              <input type="number" class="form-control" id="postal_code" name="postal_code" required pattern="\d*" inputmode="numeric" min="0" step="1">
+            </div>
+            <div class="mb-3">
+              <label for="address_type" class="form-label">Address Type</label>
+              <select class="form-select" id="address_type" name="address_type" required>
+                <option value="shipping">Shipping</option>
+                <option value="billing">Billing</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" form="addressForm" class="btn btn-primary">Add Address</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Card Modal -->
+  <div class="modal fade" id="addCardModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Card</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="cardForm" action="{{ url_for('main.add_card') }}" method="POST">
+            <div class="mb-3">
+              <label for="card_holder" class="form-label">Card Holder Name</label>
+              <input type="text" class="form-control" id="card_holder" name="card_holder" required>
+            </div>
+            <div class="mb-3">
+              <label for="card_number" class="form-label">Card Number</label>
+              <input type="text" class="form-control" id="card_number" name="card_number" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="expiry_month" class="form-label">Expiry Month</label>
+                <select class="form-select" id="expiry_month" name="expiry_month" required>
+                  {% for month in range(1, 13) %}
+                    <option value="{{ '%02d' % month }}">{{ '%02d' % month }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="expiry_year" class="form-label">Expiry Year</label>
+                <select class="form-select" id="expiry_year" name="expiry_year" required>
+                  {% for year in range(2024, 2035) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="card_type" class="form-label">Card Type</label>
+              <select class="form-select" id="card_type" name="card_type" required>
+                <option value="visa">Visa</option>
+                <option value="mastercard">Mastercard</option>
+                <option value="amex">American Express</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" form="cardForm" class="btn btn-primary">Add Card</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let selectedShippingAddress = null;
+    let selectedBillingAddress = null;
+    let selectedCard = null;
+
+    // Modal Functions
+    function openAddAddressModal(type) {
+      document.getElementById('address_type_input').value = type;
+      document.getElementById('addAddressModal').style.display = 'block';
+    }
+
+    function closeAddAddressModal() {
+      document.getElementById('addAddressModal').style.display = 'none';
+    }
+
+    function openAddCardModal() {
+      document.getElementById('addCardModal').style.display = 'block';
+    }
+
+    function closeAddCardModal() {
+      document.getElementById('addCardModal').style.display = 'none';
+    }
+
+    // Selection Functions
+    function selectAddress(type, addressId) {
+      if (type === 'shipping') {
+        selectedShippingAddress = addressId;
+        document.querySelectorAll('#shipping-addresses .address-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+        event.currentTarget.classList.add('selected');
+        
+        // If "Same as shipping" is checked, update billing address
+        if (document.getElementById('same-as-shipping').checked) {
+          selectedBillingAddress = addressId;
+        }
+      } else {
+        selectedBillingAddress = addressId;
+        document.querySelectorAll('#billing-addresses .address-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+        event.currentTarget.classList.add('selected');
+      }
+      updateCheckoutButton();
+    }
+
+    function selectCard(cardId) {
+      selectedCard = cardId;
+      document.querySelectorAll('#payment-methods .card-item').forEach(card => {
+        card.classList.remove('selected');
+      });
+      event.currentTarget.classList.add('selected');
+      updateCheckoutButton();
+    }
+
+    function toggleBillingAddress() {
+      const sameAsShipping = document.getElementById('same-as-shipping').checked;
+      const billingAddresses = document.getElementById('billing-addresses');
+      
+      if (sameAsShipping) {
+        billingAddresses.style.display = 'none';
+        selectedBillingAddress = selectedShippingAddress;
+      } else {
+        billingAddresses.style.display = 'block';
+      }
+      
+      updateCheckoutButton();
+    }
+
+    function updateCheckoutButton() {
+      const button = document.getElementById('place-order-btn');
+      if (selectedShippingAddress && selectedBillingAddress && selectedCard) {
+        button.disabled = false;
+      } else {
+        button.disabled = true;
+      }
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+      if (event.target.className === 'modal') {
+        event.target.style.display = 'none';
+      }
+    }
+
+    // Handle form submissions
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function(event) {
+        // If this is the checkout form, let it submit normally to follow redirect
+        if (this.id === 'checkoutForm') {
+          return;
+        }
+        event.preventDefault();
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (response.redirected) {
+            window.location.href = response.url;
+            return;
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data && !data.success) {
+            alert(data.message || 'An error occurred');
+          } else {
+            location.reload();
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

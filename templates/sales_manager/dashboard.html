@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.link-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 1rem; margin-top: 2rem; }
+.link-card { background: #222; border-radius: 8px; padding: 1.5rem; text-align: center; transition: background 0.2s; cursor: pointer; }
+.link-card:hover { background: #333; }
+.link-card a { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ff5e62; font-weight: 500; text-decoration: none; gap: 0.5rem; }
+.link-card ion-icon { font-size: 2rem; }
+</style>
+
+<div class="container mt-4">
+  <h1>Sales Manager Panel</h1>
+  <div class="link-grid">
+    <div class="link-card">
+      <a href="{{ url_for('sales_manager.manage_products') }}">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        <span>Set Product Prices</span>
+      </a>
+    </div>
+    <div class="link-card">
+      <a href="{{ url_for('sales_manager.manage_orders') }}">
+        <ion-icon name="list-outline"></ion-icon>
+        <span>Manage Orders</span>
+      </a>
+    </div>
+    <div class="link-card">
+      <a href="{{ url_for('sales_manager.manage_returns') }}">
+        <ion-icon name="reload-outline"></ion-icon>
+        <span>Manage Returns</span>
+      </a>
+    </div>
+    <div class="link-card">
+      <a href="{{ url_for('sales_manager.discounts') }}">
+        <ion-icon name="pricetags-outline"></ion-icon>
+        <span>Apply Discounts</span>
+      </a>
+    </div>
+    <div class="link-card">
+      <a href="{{ url_for('sales_manager.invoices') }}">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <span>View Invoices</span>
+      </a>
+    </div>
+    <div class="link-card">
+      <a href="{{ url_for('sales_manager.reports') }}">
+        <ion-icon name="stats-chart-outline"></ion-icon>
+        <span>Revenue & Profit Report</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.orders-table-container { margin-top: 2rem; }
+.orders-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #222;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #0003;
+}
+.orders-table th, .orders-table td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+}
+.orders-table th {
+  background: #232323;
+  color: #ff5e62;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-bottom: 2px solid #333;
+}
+.orders-table tr {
+  transition: background 0.15s;
+}
+.orders-table tr:hover {
+  background: #292929;
+}
+.orders-table td {
+  color: #eee;
+  border-bottom: 1px solid #292929;
+}
+.status-badge {
+  display: inline-block;
+  padding: 0.3em 0.8em;
+  border-radius: 1em;
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.status-processing { background: #ff9f43; color: #222; }
+.status-delivered { background: #2ecc71; color: #fff; }
+.status-refunded { background: #e74c3c; color: #fff; }
+.action-btn {
+  background: #ff5e62;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.4rem 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  transition: background 0.2s;
+}
+.action-btn.invoice { background: #48dbfb; color: #222; }
+.action-btn.invoice:hover { background: #1fa9c9; }
+.action-btn.refund { background: #e74c3c; color: #fff; }
+.action-btn.refund:hover { background: #c0392b; }
+</style>
+
+<div class="container mt-4">
+  <h1>Manage Orders</h1>
+  <div class="orders-table-container">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th style="width:80px;">Order ID</th>
+          <th>Customer</th>
+          <th style="width:140px;">Date</th>
+          <th style="width:120px;">Status</th>
+          <th style="width:120px;">Total</th>
+          <th style="width:160px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td>{{ order.user.username }}</td>
+          <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+          <td>
+            <span class="status-badge status-{{ order.status|lower }}">
+              {{ order.status.replace('_', ' ').title() }}
+            </span>
+          </td>
+          <td>${{ '%.2f'|format(order.total_price) }}</td>
+          <td>
+            <button class="action-btn invoice view-pdf" data-id="{{ order.id }}">Invoice</button>
+            {% if order.status == 'delivered' %}
+            <button class="action-btn refund refund-order" data-id="{{ order.id }}">Refund</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Download invoice
+document.querySelectorAll('.view-pdf').forEach(btn => {
+  btn.addEventListener('click', () => {
+    window.open(`/api/invoices/${btn.dataset.id}/pdf`, '_blank');
+  });
+});
+
+// Process refund
+document.querySelectorAll('.refund-order').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (confirm('Confirm refund for this order?')) {
+      fetch(`/api/refunds/${btn.dataset.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved: true })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) alert(data.error || 'Error processing refund');
+        else location.reload();
+      });
+    }
+  });
+});
+</script>
+{% endblock %} 

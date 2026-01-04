@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Debug bilgisi -->
+<div style="display: none;">
+    Number of products: {{ products|length }}
+    {% for product in products %}
+    Product: {{ product.name }} (ID: {{ product.id }})
+    {% endfor %}
+</div>
+
+<div class="container mt-4">
+    <!-- Search and Sort Bar -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search products by name or description...">
+        </div>
+        <div class="col-md-4">
+            <select id="sortSelect" class="form-control">
+                <option value="name">Sort by Name</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="stock">Stock Available</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="mb-4">
+        <h5 class="text-white">Categories</h5>
+        <div class="btn-group">
+            <button class="btn btn-secondary active" data-category="all">All</button>
+            <button class="btn btn-secondary" data-category="Processors">Processors</button>
+            <button class="btn btn-secondary" data-category="Graphics Cards">Graphics Cards</button>
+            <button class="btn btn-secondary" data-category="Memory">Memory</button>
+            <button class="btn btn-secondary" data-category="Storage">Storage</button>
+        </div>
+    </div>
+
+    <!-- Price Range Filters -->
+    <div class="mb-4">
+        <h5 class="text-white">Price Range</h5>
+        <div class="btn-group">
+            <button class="btn btn-secondary" data-price="0-100">$0 - $100</button>
+            <button class="btn btn-secondary" data-price="100-500">$100 - $500</button>
+            <button class="btn btn-secondary" data-price="500-1000">$500 - $1000</button>
+            <button class="btn btn-secondary" data-price="1000+">$1000+</button>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row" id="productsContainer">
+        {% if products %}
+            {% for product in products %}
+            <div class="col-md-4 mb-4 product-card" 
+                 data-name="{{ product.name }}" 
+                 data-price="{{ product.price }}"
+                 data-category="{{ product.category }}"
+                 data-stock="{{ product.stock_quantity }}">
+                <div class="card h-100 bg-dark text-white">
+                    <img src="{{ product.image }}" class="card-img-top p-3" alt="{{ product.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description }}</p>
+                        <div class="product-details">
+                            <p><strong>Model:</strong> {{ product.model }}</p>
+                            <p><strong>Serial Number:</strong> {{ product.serial_number }}</p>
+                            <p><strong>Warranty:</strong> {{ product.warranty_status }}</p>
+                            <p><strong>Distributor:</strong> {{ product.distributor_info }}</p>
+                            <div class="rating">
+                                <div class="stars">
+                                    {% for i in range(5) %}
+                                        {% if i < product.rating|int %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% elif (product.rating % 1) >= 0.5 and i == product.rating|int %}
+                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="rating-text">({{ product.rating }}/5 - {{ product.total_reviews }} reviews)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stock-info mb-2">
+                            {% if product.stock_quantity > 10 %}
+                                <span class="badge bg-success">In Stock ({{ product.stock_quantity }})</span>
+                            {% elif product.stock_quantity > 0 %}
+                                <span class="badge bg-warning">Low Stock ({{ product.stock_quantity }})</span>
+                            {% else %}
+                                <span class="badge bg-danger">Out of Stock</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">${{ "%.2f"|format(product.price) }}</h6>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-sm add-to-cart" data-product-id="{{ product.id }}">
+                                    Add to Cart
+                                </button>
+                                <a href="{{ url_for('main.product_details', product_id=product.id) }}" class="btn btn-info btn-sm">
+                                    View Details
+                                </a>
+                                <button class="btn btn-outline-secondary btn-sm add-to-wishlist {% if product.in_wishlist %}active{% endif %}" data-product-id="{{ product.id }}">
+                                    {% if product.in_wishlist %}
+                                        <i class="fas fa-heart"></i>
+                                    {% else %}
+                                        <i class="far fa-heart"></i>
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center text-white">
+                <h3>No products found</h3>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    filterProducts();
+});
+
+// Sort functionality
+document.getElementById('sortSelect').addEventListener('change', function(e) {
+    filterProducts();
+});
+
+// Category filter
+document.querySelectorAll('[data-category]').forEach(button => {
+    button.addEventListener('click', function() {
+        document.querySelectorAll('[data-category]').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        filterProducts();
+    });
+});
+
+// Price range filter
+document.querySelectorAll('[data-price]').forEach(button => {
+    button.addEventListener('click', function() {
+        document.querySelectorAll('[data-price]').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        filterProducts();
+    });
+});
+
+function filterProducts() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const sortValue = document.getElementById('sortSelect').value;
+    const selectedCategory = document.querySelector('[data-category].active').dataset.category;
+    const selectedPriceRange = document.querySelector('[data-price].active')?.dataset.price;
+
+    const products = Array.from(document.getElementsByClassName('product-card'));
+
+    products.forEach(product => {
+        const name = product.dataset.name.toLowerCase();
+        const price = parseFloat(product.dataset.price);
+        const category = product.dataset.category;
+        
+        let visible = name.includes(searchTerm);
+        
+        // Category filter
+        if (selectedCategory !== 'all') {
+            visible = visible && category === selectedCategory;
+        }
+
+        // Price range filter
+        if (selectedPriceRange) {
+            const [min, max] = selectedPriceRange.split('-').map(val => val === '+' ? Infinity : parseFloat(val));
+            visible = visible && price >= min && price <= max;
+        }
+
+        product.style.display = visible ? '' : 'none';
+    });
+
+    // Sort products
+    const productsContainer = document.getElementById('productsContainer');
+    const sortedProducts = Array.from(products).sort((a, b) => {
+        const aValue = a.dataset[sortValue === 'name' ? 'name' : 'price'];
+        const bValue = b.dataset[sortValue === 'name' ? 'name' : 'price'];
+
+        if (sortValue === 'name') {
+            return aValue.localeCompare(bValue);
+        } else if (sortValue === 'price-low') {
+            return parseFloat(aValue) - parseFloat(bValue);
+        } else if (sortValue === 'price-high') {
+            return parseFloat(bValue) - parseFloat(aValue);
+        } else if (sortValue === 'stock') {
+            return parseFloat(b.dataset.stock) - parseFloat(a.dataset.stock);
+        }
+    });
+
+    sortedProducts.forEach(product => productsContainer.appendChild(product));
+}
+
+// Add to Cart functionality
+document.querySelectorAll('.add-to-cart').forEach(button => {
+    button.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        fetch(`/api/cart/add/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Product added to cart successfully!');
+            } else {
+                alert(data.message || 'Failed to add product to cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while adding the product to cart');
+        });
+    });
+});
+
+// Add to Wishlist functionality
+document.querySelectorAll('.add-to-wishlist').forEach(button => {
+    button.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        const buttonEl = this;
+        const iconEl = this.querySelector('i');
+        fetch(`/api/wishlist/${productId}`, { method: 'POST', credentials: 'same-origin' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                if (data.in_wishlist) {
+                    buttonEl.classList.add('active');
+                    iconEl.classList.remove('far');
+                    iconEl.classList.add('fas');
+                    alert('Product added to wishlist!');
+                } else {
+                    buttonEl.classList.remove('active');
+                    iconEl.classList.remove('fas');
+                    iconEl.classList.add('far');
+                    alert('Product removed from wishlist!');
+                }
+            } else {
+                alert(data.message || 'Failed to update wishlist');
+            }
+        })
+        .catch(err => {
+            console.error('Wishlist error:', err);
+            alert('An error occurred while updating wishlist');
+        });
+    });
+});
+</script>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.product-details {
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+.rating {
+    margin: 10px 0;
+}
+
+.rating .stars {
+    display: inline-block;
+}
+
+.rating-text {
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.add-to-wishlist.active {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.stock-info {
+    margin-top: 10px;
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: contain;
+    background-color: #2a2a2a;
+}
+</style>
+{% endblock %} 

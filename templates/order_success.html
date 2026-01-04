@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Successful - ChipMaster</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+    body { font-family: 'Poppins', sans-serif; background: #1a1a1a; color: #eee; line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
+    header { background: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.5); position: fixed; width: 100%; top: 0; z-index: 10; padding: 10px 0; }
+    .container { width: 90%; max-width: 1200px; margin: auto; overflow: hidden; }
+    nav { display: flex; justify-content: space-between; align-items: center; }
+    .logo-link { text-decoration: none; }
+    .logo-text { font-size: 1.8rem; font-weight: 700; color: #ff5e62; transition: transform 0.3s ease-in-out; display: inline-block; }
+    .logo-text:hover { transform: scale(1.1); }
+    .nav-links { list-style: none; display: flex; align-items: center; }
+    .nav-links li { margin-left: 1.5rem; display: flex; align-items: center; }
+    .nav-links li a { color: #eee; font-weight: 500; transition: color 0.3s; display: flex; align-items: center; }
+    .nav-links li a ion-icon { font-size: 1.2rem; margin-right: 0.3rem; vertical-align: middle; }
+    .nav-links li a:hover { color: #ff5e62; }
+    .main-content { padding-top: 90px; min-height: 100vh; }
+    .checkout-title { color: #ff5e62; font-size: 2.5rem; font-weight: 600; margin-bottom: 2rem; text-align: center; }
+    .card { background: #222; border-radius: 10px; margin-bottom: 1rem; }
+    .card-header { background: #2d2d2d; padding: 1rem; border-bottom: 1px solid #333; }
+    .card-header h5 { color: #ff5e62; font-weight: 600; margin: 0; }
+    .card-body { padding: 1rem; }
+    .table { color: #eee; }
+    .table th, .table td { border-color: #333; }
+    .btn-primary { background: #ff5e62; border: none; }
+    .btn-primary:hover { background: #e94057; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="{{ url_for('main.home') }}" class="logo-link">
+          <h1 class="logo-text">ChipMaster</h1>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('main.home') }}"><ion-icon name="home-outline"></ion-icon>Home</a></li>
+          <li><a href="{{ url_for('main.products') }}"><ion-icon name="pricetag-outline"></ion-icon>Products</a></li>
+          <li><a href="{{ url_for('main.cart') }}"><ion-icon name="cart-outline"></ion-icon>My Cart</a></li>
+          <li><a href="{{ url_for('main.wishlist') }}" title="Wishlist"><ion-icon name="heart-outline" style="font-size:1.3rem;"></ion-icon> Wishlist</a></li>
+          {% if session.get('logged_in') %}
+            <li><a href="{{ url_for('main.profile') }}"><ion-icon name="person-outline"></ion-icon>{{ session.get('username', 'User') }}</a></li>
+            <li><a href="{{ url_for('main.logout') }}"><ion-icon name="log-out-outline"></ion-icon>Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('main.login') }}"><ion-icon name="person-outline"></ion-icon>Log In</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="container">
+      <h1 class="checkout-title">Order Successful!</h1>
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">Order #{{ order.id }}</h5>
+            <small class="text-muted">Placed on {{ order.order_date.strftime('%B %d, %Y') }}</small>
+          </div>
+          <span class="badge bg-success">Success</span>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <h6>Items:</h6>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr>
+                  </thead>
+                  <tbody>
+                    {% for item in order.order_items %}
+                    <tr>
+                      <td>{{ item.product.name }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                      <td>${{ "%.2f"|format(item.total_price) }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="3" class="text-end"><strong>Order Total:</strong></td>
+                      <td><strong>${{ "%.2f"|format(order.total_price) }}</strong></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <h6>Delivery Address:</h6>
+              <p>{{ order.delivery_address }}</p>
+              <h6>Payment Method:</h6>
+              <p>{{ order.payment_method }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center">
+        <a href="{{ url_for('main.home') }}" class="btn btn-primary">Continue Shopping</a>
+        {% if order.status == 'processing' %}
+        <button id="cancel-order-btn" class="btn btn-danger ms-3" style="background:#e94057;border:none;">Cancel Order</button>
+        {% endif %}
+      </div>
+      {% if items %}
+        <div class="container mt-5">
+          <h3 class="checkout-title">Rate Your Purchased Products</h3>
+          {% for item in items %}
+            <div class="card mb-3">
+              <div class="row g-0 align-items-center">
+                <div class="col-md-2">
+                  <img src="{{ item.image }}" class="img-fluid p-2" alt="{{ item.name }}">
+                </div>
+                <div class="col-md-10">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    {% if item.can_rate %}
+                      <div class="rating-form" data-product-id="{{ item.id }}">
+                        {% for i in range(1, 6) %}
+                          <label><input type="radio" name="rating-{{ item.id }}" value="{{ i }}"> {{ i }}</label>
+                        {% endfor %}
+                        <textarea class="form-control mt-2" placeholder="Leave a comment"></textarea>
+                        <button class="btn btn-primary mt-2 submit-rating">Submit Rating</button>
+                      </div>
+                    {% else %}
+                      <p class="text-success">You have already rated this product.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <script>
+          document.querySelectorAll('.submit-rating').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const form = this.closest('.rating-form');
+              const productId = form.dataset.productId;
+              const ratingInput = form.querySelector('input[name="rating-'+productId+'"]:checked');
+              const comment = form.querySelector('textarea').value.trim();
+              if (!ratingInput || !comment) { alert('Please select a rating and enter a comment.'); return; }
+              fetch('/api/reviews/'+productId, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({rating: parseInt(ratingInput.value), comment: comment})
+              }).then(res=>res.json()).then(data=>{
+                if (data.success) { form.innerHTML = '<p class="text-success">Thank you for your feedback!</p>'; }
+                else { alert(data.message||'Error submitting rating.'); }
+              }).catch(err=>{console.error(err);alert('Error submitting rating.');});
+            });
+          });
+          {% if order.status == 'processing' %}
+          document.getElementById('cancel-order-btn').onclick = function() {
+            if (!confirm('Are you sure you want to cancel this order?')) return;
+            fetch('/api/orders/{{ order.id }}/cancel', {method:'POST',headers:{'Content-Type':'application/json'}})
+            .then(res=>res.json())
+            .then(data=>{
+              if(data.success){
+                alert('Order cancelled successfully.');
+                location.reload();
+              }else{
+                alert(data.message||'Order could not be cancelled.');
+              }
+            });
+          };
+          {% endif %}
+        </script>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

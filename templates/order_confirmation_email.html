@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Order Confirmation - ChipMaster</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #000;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      color: #ddd;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #111;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+    .logo {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #ff5e62;
+      margin-bottom: 15px;
+    }
+    h1 {
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1rem;
+      color: #bbb;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .order-details {
+      text-align: left;
+      margin: 0 auto 20px auto;
+      display: inline-block;
+      color: #fff;
+      background: #181818;
+      border-radius: 8px;
+      padding: 18px 28px;
+    }
+    .order-details ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      margin: 20px 0;
+      background: #ff5e62;
+      color: white !important;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 5px;
+      transition: background 0.3s ease-in-out;
+    }
+    .btn:hover {
+      background: #e94057;
+      color: white !important;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ChipMaster Logo -->
+    <div class="logo">ChipMaster</div>
+
+    <!-- Main Content -->
+    <h1>Order Confirmation</h1>
+    <p>Thank you for your purchase! Your order has been confirmed.</p>
+
+    <!-- Order Details -->
+    <div class="order-details">
+      <ul>
+        <li><b>Order ID:</b> {{ order_id }}</li>
+        <li><b>Order Date:</b> {{ order_date }}</li>
+        <li><b>Total Amount:</b> ${{ total_amount }}</li>
+        <li><b>Payment Method:</b> {{ payment_method }}</li>
+        <li><b>Delivery Address:</b> {{ delivery_address }}</li>
+      </ul>
+    </div>
+
+    <!-- View Order Button (optional) -->
+    <a href="{{ order_url }}" class="btn" style="color: white !important;">View Order</a>
+
+    <p>You can track your order status in your account dashboard.<br>Thank you for shopping with us!</p>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>&copy; 2025 ChipMaster. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html> 
